@@ -1,11 +1,23 @@
 #!/bin/bash
 apt-get update
-apt-get install zip unzip php7.0 php7.0-common php7.0-curl php7.0-json php7.0-xml php7.0-mbstring php7.0-zip
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('SHA384', 'composer-setup.php') === '55d6ead61b29c7bdee5cccfb50076874187bd9f21f65d8991d46ec5cc90518f447387fb9f76ebae1fbbacf329e583e30') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-mv composer.phar /usr/local/bin/composer
+apt-get install -y zip unzip php7.0 php7.0-common php7.0-curl php7.0-json php7.0-xml php7.0-mbstring php7.0-zip apache2 libapache2-mod-php emacs
+curl -OL https://getcomposer.org/download/1.4.1/composer.phar && mv composer.phar /usr/local/bin/composer
+chmod +x /usr/local/bin/composer
 
 su -c 'composer global require "laravel/installer"' ubuntu
 su -c 'echo "PATH=\$PATH:\$HOME/.config/composer/vendor/bin" >> ~/.bashrc' ubuntu
+rm -rf /var/www/html
+cd /var/www/ && git clone https://github.com/lsulibraries/dsl-print-culture
+ln -s /var/www/dsl-print-culture/public /var/www/html
+cd /var/www/dsl-print-culture && composer install
+cd /var/www/dsl-print-culture  && php artisan storage:link
+git -C /var/www/dsl-print-culture submodule init
+git -C /var/www/dsl-print-culture submodule update
+cd /var/www/dsl-print-culture && mv .env.example .env
+cd /var/www/dsl-print-culture && php artisan key:generate
+a2enmod rewrite
+cp /vagrant/000-default.conf /etc/apache2/sites-enabled/000-default.conf
+service apache2 restart
+chown -R www-data /var/www/html
+
+echo "            !!!!!!   To complete the build, be sure to log into the box and update the private git submodule at /var/www/dsl-print-culture/.        git submodule update"
