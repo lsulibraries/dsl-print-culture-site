@@ -19,5 +19,6 @@ a2enmod rewrite
 cp /vagrant/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 service apache2 restart
 chown -R www-data /var/www/dsl-print-culture
+chmod -R 777 /var/www/dsl-print-culture
 
 echo "            !!!!!!   To complete the build, be sure to log into the box and update the private git submodule at /var/www/dsl-print-culture/.        git submodule update"
