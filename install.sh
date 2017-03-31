@@ -11,13 +11,18 @@ cd /var/www/ && git clone https://github.com/lsulibraries/dsl-print-culture
 ln -s /var/www/dsl-print-culture/public /var/www/html
 cd /var/www/dsl-print-culture && composer install
 cd /var/www/dsl-print-culture  && php artisan storage:link
+
 git -C /var/www/dsl-print-culture submodule init
 git -C /var/www/dsl-print-culture submodule update
+git config --global core.fileMode false
+
 cd /var/www/dsl-print-culture && mv .env.example .env
 cd /var/www/dsl-print-culture && php artisan key:generate
+
 a2enmod rewrite
 cp /vagrant/000-default.conf /etc/apache2/sites-enabled/000-default.conf
 service apache2 restart
+
 chown -R www-data /var/www/dsl-print-culture
 chmod -R 777 /var/www/dsl-print-culture
 
